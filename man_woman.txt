@@ -1,0 +1,1 @@
+STRING.trn MAN.agt GIVE.abs SIBLING.trn –.. WOMAN.agt REAP.abs CHILD.trn
