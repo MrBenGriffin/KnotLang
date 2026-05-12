@@ -190,9 +190,9 @@ def build_arg_parser():
 
 if __name__ == "__main__":
     import sys
-    x, y = 9, 6
+    x, y = 3, 3
     args = sys.argv[1:] or dict_to_argv({"input": 'man_woman.txt', "spaces": 0.11, "straights": 0.37, "dimensions": [(1+2*x), (2+2*y)], "connectivity": 0.99,
-                                         "border": 0, "worker": "F", "symmetry": "N", "hex": "O", "translate": 1})
+                                         "border": 0, "worker": "W", "symmetry": "N", "hex": "H", "translate": 1})
     parser = build_arg_parser()
     arg_dict = vars(parser.parse_args(args))
     translate = arg_dict['translate'] == 1
