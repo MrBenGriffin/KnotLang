@@ -340,8 +340,12 @@ class Lexicon:
         """
         Lexically expand a script by applying kennings and case rules.
         """
+        rev_particles = {v: k for k, v in self._particles.items()}
         result = []
         for word_case in script:
-            word, case = word_case if isinstance(word_case, tuple) else (word_case, 'nom')
-            result.extend(self._expand(word, case))
+            if not isinstance(word_case, tuple) and word_case in rev_particles:
+                result.append(('–', word_case))
+            else:
+                word, case = word_case if isinstance(word_case, tuple) else (word_case, 'nom')
+                result.extend(self._expand(word, case))
         return result
