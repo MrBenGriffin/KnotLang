@@ -106,7 +106,8 @@ def make_knot(args: dict, text: list = None, translate: bool = True) -> tuple:
         knot_work.join()
     remaining = master.text if isinstance(master, Writer) else []
     read_text = knot_work.lattice.decode() if translate else ''
-    return knot_work.lattice.code(), read_text, remaining
+    spoken_text = knot_work.lattice.speak() if translate else ''
+    return knot_work.lattice.code(), read_text, spoken_text, remaining
 
 def dict_to_argv(d):
     argv = []
@@ -190,9 +191,9 @@ def build_arg_parser():
 
 if __name__ == "__main__":
     import sys
-    x, y = 3, 3
-    args = sys.argv[1:] or dict_to_argv({"input": 'man_woman.txt', "spaces": 0.11, "straights": 0.37, "dimensions": [(1+2*x), (2+2*y)], "connectivity": 0.99,
-                                         "border": 0, "worker": "W", "symmetry": "N", "hex": "H", "translate": 1})
+    x, y = 5, 11
+    args = sys.argv[1:] or dict_to_argv({"input": 'wind_war.txt', "spaces": 0.78, "straights": 0.17, "dimensions": [(1+2*x), (2+2*y)], "connectivity": 0.99,
+                                         "border": 0, "worker": "W", "symmetry": "N", "hex": "O", "translate": 1})
     parser = build_arg_parser()
     arg_dict = vars(parser.parse_args(args))
     translate = arg_dict['translate'] == 1
@@ -203,6 +204,7 @@ if __name__ == "__main__":
     remaining = text
     pages = []
     texts = []
+    spoken = []
     page = 0
     while True:
         page_args = dict(arg_dict)
@@ -210,15 +212,18 @@ if __name__ == "__main__":
             page_args['random'] = seed + page
         elif page > 0:
             page_args['random'] = os.urandom(7)
-        code, read_text, next_remaining = make_knot(page_args, remaining, translate=translate)
+        code, read_text, spoken_text, next_remaining = make_knot(page_args, remaining, translate=translate)
         pages.append(code)
         texts.append(read_text)
+        spoken.append(spoken_text)
         if not next_remaining or next_remaining == remaining:
             break
         remaining = next_remaining
         page += 1
     result = ''.join(pages)
     result += '\n' + (''.join(texts))
+    if translate:
+        result += '\n' + (' '.join(spoken))
     if arg_dict.get('output'):
         with open(arg_dict['output'], 'w', encoding='utf-8') as f:
             f.write(result)

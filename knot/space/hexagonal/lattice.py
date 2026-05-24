@@ -114,3 +114,19 @@ class Lattice(CRSLattice):
             lex_rt, lex_case = lex.roots[cell]
             result += f' {lex_rt}.{lex_case}'
         return result
+
+    def speak(self, ascii_mode: bool = False) -> str:
+        from .lexicon import Lexicon
+        from .phonology import pronounce
+        lex = Lexicon()
+        parts = []
+        for idx in self.text_cells:
+            cell = self.cells[idx].code()
+            if cell == '  ':
+                cell = 'OOOOOO'
+            lex_rt, lex_case = lex.roots[cell]
+            if lex_rt == '–':
+                parts.append(lex_case)
+            else:
+                parts.append(pronounce(cell, ascii=ascii_mode))
+        return ' '.join(parts)

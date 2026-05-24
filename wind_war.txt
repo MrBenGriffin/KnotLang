@@ -1,0 +1,5 @@
+ WAS.loc THEY.agt CHOICE.int DEATH.abs
+ WAS.loc THEY.agt CHOICE.int CONFLICT.abs
+ WAS.loc THEY.agt CHOICE.int HATE.abs
+ WAS.loc THEY.agt THEY.gen CHOICE.nom WE.acc GIVE.trn
+ ∴ WILL.loc WIND.agt WE.gen CHOICE.nom THEY.acc GIVE.trn

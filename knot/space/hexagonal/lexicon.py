@@ -73,6 +73,7 @@ class Lexicon:
             'SURE': ['KNOW', 'KNOW'],
             'TRUTH': ['KNOW', 'FACT'],
             'BELIEF': ['HOLD', 'FACT'],
+            'CHOICE': ['POSITION', 'WEAVE'],
             'FLESH': ['HUNT', 'FOOD'],
             'FEATHER': ['BIRD', 'EDGE'],
             'GREASE': ['BODY', 'FIRE', 'WATER'],
@@ -161,7 +162,7 @@ class Lexicon:
             'ROUND': ['CIRCLE', 'PATH'],
             'FULL': ['DISC'],
             'ENTIRE': ['DISC'],
-
+            'CONFLICT': ['BREAK', 'BETWEEN'],
             'AGAIN': ['PRIOR', 'ALIKE'],
             'EXCHANGE': ['BETWEEN', 'GIVE'],
             'ALL': [('FIELD', 'abs'), 'CIRCLE'],
@@ -170,6 +171,8 @@ class Lexicon:
             'DRINK.n': ['WATER', 'FOOD'],
             'DRINK': ['WATER', 'EAT'],
             # hot/cold
+            'HATE': [('HARM', 'trn'), 'FEEL'],  #
+            'HURT': [('HARM', 'int'), 'FEEL'],  #
             'HOT': ['FIRE', 'FEEL'],
             'COLD': ['WATER', 'FEEL'],
             'DRY': ['HIDE', 'WATER'],
