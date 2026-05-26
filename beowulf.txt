@@ -1,0 +1,11 @@
+# Hīe dȳgel lond wariġeað
+they.agt hide.adj marches.loc watch.int
+
+# wulfhleoþu windiġe næssas frēċne fenġelād
+wolf.adj scree , wind.adj crag , harm.adj fenway
+
+# ðǣr fyrġenstrēam under næssa ġenipu niþer ġewīteð flōd under foldan
+mountain.adj stream.agt crag.acc descend.int ; shadow.adj subterranean.acc go.trn ; ground.acc flood.int
+
+# nis þæt feor heonon mīlġemearces þæt se mere standeð
+not far.loc here.abs : half day.gen walk.abs , lake.agt wait.int

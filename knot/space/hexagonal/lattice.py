@@ -99,7 +99,7 @@ class Lattice(CRSLattice):
                     r_t += cell
                 else:
                     r_b += cell
-            result += r_t + "\n" + r_b + "\n"
+            result += r_t.rstrip() + "\n" + r_b.rstrip() + "\n"
         return result
 
 
@@ -117,16 +117,38 @@ class Lattice(CRSLattice):
 
     def speak(self, ascii_mode: bool = False) -> str:
         from .lexicon import Lexicon
-        from .phonology import pronounce
+        from .phonology import pronounce, pronounce_punctuation
         lex = Lexicon()
-        parts = []
+
+        # Collect (cell_key, is_punct) for all text cells
+        items = []
         for idx in self.text_cells:
             cell = self.cells[idx].code()
             if cell == '  ':
                 cell = 'OOOOOO'
             lex_rt, lex_case = lex.roots[cell]
-            if lex_rt == '–':
-                parts.append(lex_case)
+            items.append((cell, lex_case, lex_rt == '–'))
+
+        # Precompute lookahead: does a non-punct word follow position i?
+        n = len(items)
+        has_word_after = [False] * n
+        for i in range(n - 2, -1, -1):
+            if not items[i + 1][2]:
+                has_word_after[i] = True
             else:
-                parts.append(pronounce(cell, ascii=ascii_mode))
+                has_word_after[i] = has_word_after[i + 1]
+
+        parts = []
+        for i, (cell, lex_case, is_punct) in enumerate(items):
+            if is_punct:
+                # Punctuation clitics: speak only the case syllable (stop + vowel)
+                parts.append(pronounce_punctuation(cell, ascii=ascii_mode))
+            else:
+                next_is_punct = (i + 1 < n and items[i + 1][2])
+                # Nom word mid-sequence (not immediately before punct) = compound internal
+                is_internal = (lex_case == 'nom') and has_word_after[i] and not next_is_punct
+                # True utterance end: no following words and no following punct clitic
+                is_terminal = not has_word_after[i] and not next_is_punct
+                parts.append(pronounce(cell, ascii=ascii_mode, bare=is_internal, terminal=is_terminal))
+
         return ' '.join(parts)

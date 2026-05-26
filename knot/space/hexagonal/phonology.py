@@ -8,12 +8,17 @@ Each 6-trit ideogram key (CRRCRR written order) maps to a spoken form:
   3. Root consonants use continuants (M / L / Ŋ); case consonants use stops (P / T / K)
   4. Elide final vowel if identical to the preceding vowel (position 6 == position 4)
   5. Nominative (XX) may be dropped; a bare 4-phoneme form is read as nominative on parse.
+  6. Terminal vowel elision: at a true utterance boundary, the final vowel is dropped.
+     This is suspended before punctuation clitics (use pronounce with terminal=False).
+  7. Compounds: internal morphemes appear in bare root form (bare=True, 4 phonemes).
+  8. Punctuation: only the case syllable (stop + vowel) is spoken; use pronounce_punctuation.
 """
 
 _CON  = {'O': 'M',  'I': 'L',  'X': 'Ŋ'}
 _CON_ASCII = {'O': 'M', 'I': 'L', 'X': 'NG'}
 _STOP = {'O': 'P',  'I': 'T',  'X': 'K'}
 _VOW  = {'O': 'U',  'I': 'I',  'X': 'A'}
+_VOWELS = frozenset(_VOW.values())
 
 # Place of articulation → trit (same mapping for consonants and vowels)
 _TRIT = {
@@ -23,10 +28,14 @@ _TRIT = {
 }
 
 
-def pronounce(key: str, ascii: bool = False) -> str:
+def pronounce(key: str, ascii: bool = False, bare: bool = False, terminal: bool = False) -> str:
     """Convert a 6-trit ideogram key (CRRCRR) to its spoken form.
 
-    ascii=True replaces Ŋ with NG.
+    ascii=True    — replaces Ŋ with NG.
+    bare=True     — return the 4-phoneme root only; for internal compound elements
+                    where the nominative is always dropped.
+    terminal=True — apply terminal vowel elision (utterance-final position).
+                    Must be False when the word is followed by a punctuation clitic.
     """
     c1, r1, r2, c2, r3, r4 = key[0], key[1], key[2], key[3], key[4], key[5]
     con = _CON_ASCII if ascii else _CON
@@ -38,9 +47,28 @@ def pronounce(key: str, ascii: bool = False) -> str:
         _STOP[c1],  # spoken pos 5: case consonant (stop)
         _VOW[c2],   # spoken pos 6: vowel
     ]
+    if bare:
+        return ''.join(phonemes[:4])
     if phonemes[5] == phonemes[3]:
         phonemes = phonemes[:5]
-    return ''.join(phonemes)
+    result = ''.join(phonemes)
+    if terminal and result[-1] in _VOWELS:
+        result = result[:-1]
+    return result
+
+
+def pronounce_punctuation(key: str, ascii: bool = False) -> str:
+    """Return the spoken form of a punctuation clitic: case stop + case vowel only.
+
+    Punctuation markers (CAESURA words) are prosodic clitics. Only the final
+    syllable — the case consonant and its vowel — is spoken. No elision applies.
+    The preceding word retains its final vowel (terminal elision suspended).
+
+    Examples: ∴ (trn, XO) → KU;  ? (nom, XX) → KA;  . (abs, OO) → PU
+    """
+    con = _CON_ASCII if ascii else _CON
+    c1, c2 = key[0], key[3]
+    return _STOP[c1] + _VOW[c2]
 
 
 def _tokenize(spoken: str) -> list:

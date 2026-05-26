@@ -112,7 +112,7 @@ class Cell:
 
     def code(self):
         if not self.mined():
-            return "o" * len(self.walls)
+            return "  "
         result = ''.join(["O" if c not in self.walls else self.walls[c].code(c) for c in self.dim.com()])
         return "  " if result == "OOOOOO" else result
 

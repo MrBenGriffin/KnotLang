@@ -79,13 +79,31 @@ The nine cases produce these spoken suffixes (case stop + case vowel), subject t
 
 ---
 
-## Elision rule
+## Elision rules
+
+### Case vowel elision
 
 If the final vowel (position 6) is identical to the immediately preceding vowel (position 4), it is dropped.
 
 ```
 LUŊUPU  →  LUŊUP   (final U matches preceding U — root trit 4 = O, case abs OO)
 LUŊIPA  →  LUŊIPA  (final A differs from preceding I — no elision)
+```
+
+### Terminal vowel elision
+
+At a true utterance boundary (end of speech, not before a punctuation clitic), the final vowel of the last word is dropped regardless of whether it matches the preceding vowel.
+
+```
+MUMUKA  →  MUMUK   (utterance-final; final A dropped)
+MAŊUKA  →  MAŊUK   (utterance-final; final A dropped)
+```
+
+This rule is **suspended** before a punctuation clitic — the preceding word retains its final vowel so the clitic can attach cleanly:
+
+```
+MUMAKA + ∴  →  MUMAKA-KU   (not MUMAK-KU)
+MAŊUKA + ?  →  MAŊUKA-KA   (not MAŊUK-KA)
 ```
 
 ---
@@ -97,6 +115,53 @@ The nominative case (`XX`) need not be spoken. It may be omitted when unambiguou
 A bare root (no case suffix) is four phonemes, (two syllables of CVCV). If 
 the nominative would have elided (root trit 4 = X → vowel A = case-nom vowel A), the spoken nominative form is five phonemes ending in K; 
 in that case dropping the case suffix is the natural reduction.
+
+---
+
+## Compound words
+
+In a compound word, only the final morpheme carries its case suffix. All internal morphemes appear in **bare root form** — four phonemes, nominative always dropped. This is not the optional-nominative rule; it is obligatory for compound-internal position.
+
+```
+WONDER (not-prior·ground·give, nominative):
+  phrase:   LILI-KA  LALA-K  MILU-KA  MAŊU-KA   (each word inflected)
+  compound: LILI     LALA    MILU     MAŊUKA      (internal bare; only head carries case)
+```
+
+A compound is distinguished from a phrase by this reduction: a phrase inflects each word independently; a compound inflects only the head.
+
+Further compounding is linear — the bare roots of both source compounds are concatenated, with only the final head inflected:
+
+```
+nīðwundor (harm·wonder, nominative):
+  LILI  LALA  MILU  MAŊU  LIŊU  MAŊUKA
+```
+
+---
+
+## Punctuation clitics
+
+Punctuation markers are **prosodic clitics** — they attach to the preceding word and do not constitute a true utterance boundary. Two consequences:
+
+1. **Only the final syllable is spoken**: the case stop consonant plus its vowel. The root MUMU is not pronounced.
+
+| Symbol | Case | Full form | Spoken |
+|--------|------|-----------|--------|
+| `.`    | abs  | MUMUP     | PU     |
+| `'`    | acc  | MUMAPI    | PI     |
+| `→`    | agt  | MUMAPA    | PA     |
+| `'`    | gen  | MUMATU    | TU     |
+| `:`    | loc  | MUMATI    | TI     |
+| `,`    | adj  | MUMATA    | TA     |
+| `∴`    | trn  | MUMUK     | KU     |
+| `;`    | int  | MUMUKI    | KI     |
+| `?`    | nom  | MUMUKA    | KA     |
+
+2. **Terminal vowel elision is suspended**: the word immediately before a punctuation clitic retains its final vowel.
+
+```
+MAŊUKA ∴  →  MAŊUKA-KU   (MAŊUK-KU would be wrong)
+```
 
 ---
 
@@ -143,10 +208,13 @@ Root index 0 → root trits `OOOO`. Case `abs` → case trits `OO`.
 
 A spoken form is recovered by reversing each step:
 
-1. **Restore elided vowel** — if the word ends in a consonant (5 phonemes), append the vowel at position 4.
-2. **Restore dropped nominative** — if only 4 phonemes, append `K A` (case trits `XX`).
-3. **Map phonemes to trits** — place of articulation determines trit regardless of manner: M/P → O; L/T → I; Ŋ/K → X; U → O; I → I; A → X.
-4. **Reconstruct written order** — spoken positions map back as: (5→C1)(1→R1)(2→R2)(6→C2)(3→R3)(4→R4), giving CRRCRR.
+1. **Restore terminal-elided vowel** — if the word ends in a consonant and has 5 phonemes, append the vowel at position 4. If it has 4 phonemes and ended in a consonant, it was terminal-elided bare-root (treat as nominative).
+2. **Restore case-elided vowel** — if 5 phonemes remain after step 1, append the vowel at position 4.
+3. **Restore dropped nominative** — if only 4 phonemes, append `K A` (case trits `XX`).
+4. **Map phonemes to trits** — place of articulation determines trit regardless of manner: M/P → O; L/T → I; Ŋ/K → X; U → O; I → I; A → X.
+5. **Reconstruct written order** — spoken positions map back as: (5→C1)(1→R1)(2→R2)(6→C2)(3→R3)(4→R4), giving CRRCRR.
+
+Punctuation clitics (single CV syllable) are parsed by mapping stop → case consonant trit, vowel → case vowel trit, with root trits `OOOO` (CAESURA).
 
 The roundtrip is lossless. A spoken nominative that was dropped is recovered as nominative by default — no information is lost.
 

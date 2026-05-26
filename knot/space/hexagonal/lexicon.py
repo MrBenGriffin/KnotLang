@@ -1,252 +1,49 @@
 # from ..cell import Cell
 # from dim import Dim
+import os
+
+_KENNINGS_FILE = os.path.join(os.path.dirname(__file__), 'kennings.txt')
+
 
 class Lexicon:
     def __init__(self):
-        # ALL internal elements — fixed case as specified or NOM
-        # terminal element — ALWAYS takes live case, never fixed
-        self.kennings = {
-            # These are non-kenning composites - used to match swadesh etc.
-            # differentiated by having a fixed case terminal.
-            'WORKED': [('WORK', 'int')],  # VERB[intrans] + NOUN = the verb-ed noun= result state encoded in compound
-            'BURN': [('FIRE', 'int')],
-            'HEAR': [('EAR', 'int')],
-            'SMELL': [('NOSE', 'int')],
-            'SEE': [('EYE', 'int')],
-            'TASTE': [('MOUTH', 'int')],
-            # 'FAST': [('SOON', 'int')],
-            # 'SLOW': [('LONG', 'int')],
-            'WHO': [('SELF', 'nom'), ('CAESURA', '?')],
-            'WHAT': [('SELF', 'abs'), ('CAESURA', '?')],
-            'WHERE': [('SELF', 'loc'), ('CAESURA', '?')],
-            'WHEN': ['WHERE', 'TIME', ('CAESURA', '?')],
-            # HOW = PATH[abs]·?
-            # 'Why' is disambiguated...
-            # - Causal — what caused this? = PATH[abs]·? looking backward
-            # - Consequential — to what end? = POINT[abs]·? looking forward
-            # - Motivational — from what feeling/desire? = HEART[abs]·? looking inward
-            # - Logical — by what reasoning? = KNOW[abs]·? looking at the structure
+        self.kennings = self._load_kennings()
+        self._init_roots()
 
-            # There are kennings proper. no nom. suffix.
-            'PET': ['HOUSE', 'ANIMAL'],
-            'DOG': ['WATCH', 'PET'],
-            'CAT': ['HUNT', 'PET'],
-            'KITTEN': ['CAT', 'CHILD'],
-            'PUPPY': ['DOG', 'CHILD'],
-            'TINY': ['SMALL', 'SMALL'],
-            'SIZE': ['SMALL', 'LARGE'],
-            'COUNT': ['ONE', 'MANY'],
-            'BIG': ['LARGE'],
-            'HUGE': ['LARGE', 'LARGE'],
-            'FLY': ['WIND', 'MOVE'],
-            'SWIM': ['WATER', 'MOVE'],
-            'SEED': ['MAYBE', 'CHILD'],
-            'FISH': ['WATER', 'ANIMAL'],
-            'BIRD': ['WIND', 'ANIMAL'],
-            'BLOOD': ['HEART', 'WATER'],
-            'INSECT': ['EARTH', 'ANIMAL'],
-            'TREE': ['WOOD', 'PLANT'],
-            'LEAF': ['LIGHT', 'REAP', 'PLANT', 'EDGE'],
-            'SHARP': ['POINT'],
-            'BARK': ['TREE', 'SKIN'],
-            'SKIN': ['BODY', 'EDGE'],
-            'SOFT': [('NOT', 'adj'), 'POINT'],
-            'SMOOTH': ['LEVEL', 'ALIKE', 'FEEL'],
-            'HARD': ['METAL', 'ALIKE', 'FEEL'],
-            'TEXTURE': ['SHARP', 'SOFT'],
-            'FUR': ['SOFT', 'SKIN'],
-            'GRASS': ['HAIR', 'PLANT'],
-            'FLUID': ['WATER', 'ALIKE', 'FEEL'],
-            'SOLID': ['GROUND', 'ALIKE', 'FEEL'],
-            'FOREST': ['TREE', 'TREE'],
-            'LEATHER': ['HUNT', 'SKIN'],
-            'CLOTHING': ['WEAVE', 'SKIN'],
-            'NEW': ['NOT', 'PRIOR'],  # (fresh, novel)
-            'WAS': ['TIME', 'PRIOR'],
-            'WILL': ['TIME', 'NEXT'],
-            'KNOT': ['WEAVE', 'STRING'],
-            'CLOUD': ['SKY', 'KNOT'],
-            'SMOKE': ['FIRE', 'KNOT'],
-            'ASH': ['FIRE', 'REAP'],
-            'MAZE': ['PATH', 'KNOT'],
-            'FACT': ['KNOW', 'GROUND'],
-            'SURE': ['KNOW', 'KNOW'],
-            'TRUTH': ['KNOW', 'FACT'],
-            'BELIEF': ['HOLD', 'FACT'],
-            'CHOICE': ['POSITION', 'WEAVE'],
-            'FLESH': ['HUNT', 'FOOD'],
-            'FEATHER': ['BIRD', 'EDGE'],
-            'GREASE': ['BODY', 'FIRE', 'WATER'],
-            'LOUSE': ['SMALL', 'BLOOD', 'REAP'],
-            'EGG': ['SEED', 'BONE'],
-            'HORN': ['POINT', 'BONE'],
-            'TAIL': ['BONE', 'EDGE'],
-            'CLAW': ['HAND', 'EDGE', 'BONE'],
-            'HAIR': ['SOFT', 'SKIN'],
-            'FACE': ['EYE', 'NOSE', 'CIRCLE'],
-            'HEAD': ['EYE', 'NOSE', 'GROUND'],
-            'FOOT': ['GROUND', 'HAND'],
-            'LEG': ['MOVE', 'BODY'],
-            'KNEE': ['LEG', 'BONE'],
-            'ARM': ['HAND', 'BODY'],
-            'ELBOW': ['ARM', 'BONE'],
-            'FINGERNAIL': ['CLAW'],
-            'BELLY': ['HERE', 'BODY'],
-            'STOMACH': ['FOOD', 'BODY'],
-            'NECK': ['VOICE', 'BODY'],
-            'CHEST': ['BREATH', 'BODY'],
-            'BREAST': ['MOTHER', 'BODY'],
-            'BREASTS': ['BOTH', 'BREAST'],
-            'LIVER': ['BLOOD', 'FLESH'],
-            'TOOTH': ['MOUTH', 'BONE'],
-            'TONGUE': ['HIDE', 'MOUTH'],
-            'BITE': ['BREAK', 'TOOTH'],  # verb.
-            'BITE.n': ['TOOTH', 'BREAK'], # noun.
-            'FRUIT': ['SEED', 'HOLD'],
-            'ENJOY': ['MOVE', 'HEART'],
-            'KNOWLEDGE': ['HOLD', 'KNOW'],
-            # geology
-            'STONE': ['GROUND', 'ROOT'],
-            'ROCK': ['STONE'],
-            'SAND': ['WIND', 'EARTH'],
-            'MOUNTAIN': ['POINT', 'GROUND'],
-            'ORE': ['REAP', 'METAL'],
-            'MINE': ['METAL', 'REAP'],
-            'RIVER': ['WATER', 'PATH'],
-            'GOLD': ['HEART', 'METAL'],
-            'SILVER': ['MIRROR', 'METAL'],
-            # ...
-            'GRIEF': ['METAL', 'HEART'],
-            'PICTURE': ['VOICE', 'EYE'],
-            'DRAW': ['PICTURE', 'HAND'],
-            'LANGUAGE': ['VOICE', 'HARNESS'],
-            'MIRROR': ['WATER', 'SELF'],
-            'ECHO': ['MIRROR', 'VOICE'],
-            'WRITE': ['VOICE', 'HAND'],
-            'PRIMORDIAL': ['PRIOR', 'PRIOR'],
-            'ORIGIN': ['ROOT', 'STRING'],
-            'SOURCE': ['STRING', 'ROOT'],
-            'STORY': ['VOICE', 'WEAVE'],
-            'HISTORY': ['TIME', 'WEAVE'],
-            'FALSEHOOD': ['NOT', 'FACT', 'VOICE'],
-            'SAY': ['VOICE'],
-            'TRADITIONAL': [('STRING', 'gen')],
-            'ANCESTOR': ['PRIOR', 'PERSON'],
-            'MYTH': ['SOURCE', 'STORY'],
-            'EPIC': ['TRADITIONAL', 'STORY'],
-            'LEGEND': ['ANCESTOR', 'STORY'],
-            'GOD': ['SKY', 'MOTHER', 'ONE'],
-            'KING': ['POINT', 'MAN'],
-            'QUEEN': ['POINT', 'WOMAN'],
-            'PRINCE': ['KING', 'CHILD'],
-            'PEACE': ['HEART', 'MEND'],
-            'SUN': ['DAY', 'LIGHT', 'GIVE'],
-            'MOON': ['NIGHT', 'LIGHT', 'GIVE'],
-            'STAR': ['NIGHT', 'LIGHT', 'POINT'],
-            'PRECIPITATE': ['SKY', 'FALL'],
-            'RAIN': ['FALL', 'WATER'],
-            'BEING': ['BREATH', 'ONE'],
-            'PERSON': [('NAME', 'agt'), 'ONE'],
-            'PEOPLE': ['MANY', 'PERSON'],
-            # measures
-            'DISTANT': ['LARGE', 'BETWEEN'],
-            'SHORT': ['SMALL', 'BETWEEN'],
-            'NEAR': ['SHORT', 'SPACE'],
-            'GAP': ['BETWEEN', 'SPACE'],
-            'FAR': ['DISTANT', 'SPACE'],
-             # 'LONG': ['DISTANT', 'SPACE'], # Use FAR
-            'SOON': ['SHORT', 'TIME'],    # SOON.intr quick
-            'LONG': ['DISTANT', 'TIME'],  # TIME
-            'INTERVAL': ['BETWEEN', 'TIME'],
-            'DISC': [('FIELD', 'adj'), 'CIRCLE'],
-            'ROUND': ['CIRCLE', 'PATH'],
-            'FULL': ['DISC'],
-            'ENTIRE': ['DISC'],
-            'CONFLICT': ['BREAK', 'BETWEEN'],
-            'AGAIN': ['PRIOR', 'ALIKE'],
-            'EXCHANGE': ['BETWEEN', 'GIVE'],
-            'ALL': [('FIELD', 'abs'), 'CIRCLE'],
-            'ALWAYS': [('DISC', 'adj'), 'TIME'],
-            'EVERYWHERE': [('DISC', 'adj'), 'SPACE'],
-            'DRINK.n': ['WATER', 'FOOD'],
-            'DRINK': ['WATER', 'EAT'],
-            # hot/cold
-            'HATE': [('HARM', 'trn'), 'FEEL'],  #
-            'HURT': [('HARM', 'int'), 'FEEL'],  #
-            'HOT': ['FIRE', 'FEEL'],
-            'COLD': ['WATER', 'FEEL'],
-            'DRY': ['HIDE', 'WATER'],
-            'WET': ['HOLD', 'WATER'],
-            # colours - anything can be used to give colour but for swadesh..
-            'WHITE': ['LIGHT', 'COLOUR'],
-            'BLACK': ['NIGHT', 'COLOUR'],
-            'RED': ['HEART', 'COLOUR'],
-            'YELLOW': ['FIRE', 'COLOUR'],
-            'GREEN': ['PLANT', 'COLOUR'],
-            'BLUE': ['SKY', 'COLOUR'],
-            'BROWN': ['EARTH', 'COLOUR'],
-            'SHADOW': ['NIGHT', 'ALIKE'],
-            'GREY': ['SHADOW', 'COLOUR'],
-            # ethics
-            'HARM': ['FEAR', 'GIVE'],
-            'BAD': ['HARM'],
-            'GOOD': [('GIVE', 'agt'), 'NOT', 'FEAR'],
-            'EVIL': [('HARM', 'agt'), 'REAP'],
-            'LIFE': ['BREATH'],
-            'DEATH': ['NOT', 'BREATH'],
-            'DIE': ['BREAK', 'BREATH'],
-            'KILL': [('BREAK', 'trn'), 'BREATH'],
-            # Pronouns
-            'I': [('SELF', 'int'), 'SELF'],
-            'WE': ['MANY', 'I'],
-            'YOU': [('NOT', 'acc'), 'SELF'],
-            'YALL': ['MANY', 'YOU'],
-            'IT': [('NOT', 'abs'), 'SELF'],
-            'S/HE': ['NOT', 'SELF'],  # ungendered, singular 'they'
-            'HE': ['MAN', 'S/HE'],
-            'SHE': ['WOMAN', 'S/HE'],
-            'THEY': ['MANY', 'S/HE'],  # they, animate
-            'THEY_': ['MANY', 'IT'],  # they non-animate (multiple its)
-            'THERE': [('NOT', 'abs'), 'HERE'],
-            'THAT': ['THERE', 'SELF'],
-            'THIS': ['HERE', 'SELF'],
-            'THOSE': ['MANY', 'THAT'],
-            'THESE': ['MANY', 'THIS'],
-            'COME': [('HERE', 'loc'), 'MOVE'],
-            'GO': [('THERE', 'loc'), 'MOVE'],
-            'RETURN': ['AGAIN', 'COME'],
-            'WALK': ['FOOT', 'MOVE'],
-            'LIE': ['LEVEL', 'BODY'],
-            'SIT': ['GROUND', 'BODY'],
-            'STAND': ['MOVE', 'BODY'],
-            'SEAT': ['SIT', 'HOLD'],
-            'BET': ['LIE', 'HOLD'],
+    def _load_kennings(self) -> dict:
+        kennings = {}
+        if not os.path.exists(_KENNINGS_FILE):
+            return kennings
+        with open(_KENNINGS_FILE, encoding='utf-8') as f:
+            for line in f:
+                line = line.partition('#')[0].strip()
+                if not line or '=' not in line:
+                    continue
+                word, _, comps_str = line.partition('=')
+                word = word.strip().upper()
+                components = []
+                for comp in comps_str.split():
+                    if '.' in comp:
+                        root, case = comp.split('.', 1)
+                        components.append((root.upper(), case))
+                    else:
+                        components.append(comp.upper())
+                kennings[word] = components
+        return kennings
 
-            'HER': [('NOT', 'gen'), 'SELF'],  # ungendered, same
-            # THIS/THAT/WHO/WHAT
-            # kinship
-            'MUM': ['WOMAN', 'MOTHER'],
-            'FATHER': ['MAN', 'MOTHER'],
+    def save_kenning(self, word: str, components: list):
+        word = word.upper()
+        self.kennings[word] = components
+        parts = []
+        for comp in components:
+            if isinstance(comp, tuple):
+                parts.append(f'{comp[0].upper()}.{comp[1]}')
+            else:
+                parts.append(comp.upper())
+        with open(_KENNINGS_FILE, 'a', encoding='utf-8') as f:
+            f.write(f'{word} = {" ".join(parts)}\n')
 
-            # numeric words
-            # ACC = subtraction(-). NOM = addition(+), GEN = multiplication(×), AGT = exponentiation(^)
-            # BREAK = half, ONE = 1, NEXT = 2, CIRCLE = 6
-            'TWO': ['NEXT'],
-            'BOTH': ['ONE', 'ONE'],
-            'THREE': [('BREAK', 'gen'), 'CIRCLE'],
-            'FOUR': [('NEXT', 'acc'), 'CIRCLE'],
-            'FIVE': [('ONE', 'acc'), 'CIRCLE'],
-            'SIX': ['CIRCLE'],
-            'SEVEN': ['CIRCLE', 'ONE'],
-            'EIGHT': ['CIRCLE', 'NEXT'],
-            'NINE': ['CIRCLE', 'THREE'],
-            'TEN': [('NEXT', 'acc'), 'TWELVE'],
-            'ELEVEN': [('ONE', 'acc'), 'TWELVE'],
-            'TWELVE': [('NEXT', 'gen'), 'CIRCLE'],
-            'NUMERIC_MODE': [('POSITION', 'gen'), ('ONE', 'abs')]
-        }
-        # AND=>STRING
-        # MAYBE=>BALANCE ?
+    def _init_roots(self):
         self._roots = [
             'CAESURA',
             'WIND', 'MAN', 'FIRE', 'ROOT', 'EYE', 'SIBLING', 'EAR', 'DAY', 'EARTH',
@@ -292,6 +89,18 @@ class Lexicon:
             'XI': ';',  # 'int' = first / then / ordered / items of ranked weight
             'XX': '?',  # 'nom' = interrogative / '?'
         }
+        self._particle_docs = {
+            'OO': 'full stop, end of statement',
+            'OI': 'closer - "is what was said"',
+            'OX': 'if/when / conditional / at which point',
+            'IO': 'opener — "she said:... "',
+            'II': 'in other words / that is to say / zoom-in',
+            'IX': 'also / unordered / items of equal weight',
+            'XO': 'causal break — "because / therefore / then"',
+            'XI': 'first / then / ordered / items of ranked weight',
+            'XX': 'interrogative / ?',
+        }
+
         self.roots = {}
         c_list = list(self.cases.keys())
         t_mul = [3 ** (3 - i) for i in range(4)]
@@ -319,10 +128,19 @@ class Lexicon:
         if seen is None:
             seen = set()
         key = word.upper()
+        case = case.lower() if case not in self._particles.values() else case
         if key in seen:
             raise ValueError(f"Circular kenning reference: '{key}'")
-        add_seen = seen | {key}  #
+        add_seen = seen | {key}
         if key not in self.kennings:
+            if key == '–':
+                return [(word, case)]
+            if key == 'CAESURA':
+                # Convert case name to particle symbol for the rev lookup
+                symbol = self._particles.get(
+                    next((c for c, n in self.cases.items() if n == case), case), case
+                )
+                return [('–', symbol)]
             if key not in self._roots:
                 print(f"Unknown word: '{key}'")
             return [(word, case)]
@@ -343,12 +161,20 @@ class Lexicon:
         """
         Lexically expand a script by applying kennings and case rules.
         """
+        return [item for group in self.lex_groups(script) for item in group]
+
+    def lex_groups(self, script: list) -> list[list[tuple]]:
+        """
+        Like lex(), but returns a list of expansion-groups: one inner list per
+        input token. A kenning yields a group of multiple ideographs; a plain
+        root or punctuation yields a singleton group.
+        """
         rev_particles = {v: k for k, v in self._particles.items()}
-        result = []
+        groups = []
         for word_case in script:
             if not isinstance(word_case, tuple) and word_case in rev_particles:
-                result.append(('–', word_case))
+                groups.append([('–', word_case)])
             else:
                 word, case = word_case if isinstance(word_case, tuple) else (word_case, 'nom')
-                result.extend(self._expand(word, case))
-        return result
+                groups.append(self._expand(word, case))
+        return groups
